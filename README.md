@@ -1,0 +1,15 @@
+# EmailSender
+
+
+
+Simple email sender with Python.
+
+
+In main.py there are two variables that take the email and the password from the .env file.
+
+If you want to send email to someone from your gmail account you need to write your own email and password.
+
+############### main.py ####################
+EMAIL_ADDR = os.environ.get('EMAIL')
+EMAIL_PW = os.environ.get('APP_PW')
+####################################

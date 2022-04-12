@@ -1,5 +1,7 @@
 from dotenv import load_dotenv
 from email.message import EmailMessage
+from pathlib import Path
+from tkinter import messagebox as mb
 import os
 import smtplib
 import imghdr
@@ -13,17 +15,29 @@ EMAIL_PW = os.environ.get('APP_PW')
 
 
 class emailApp:
-   def __init__(self, subject, body, receiver):
+   def __init__(self, subject, body, receiver, attach):
       self.subject = subject
       self.body = body
       self.receiver = receiver
+      self.attach = attach
 
       self.msg = EmailMessage()
       self.msg['Subject'] = subject
       self.msg['From'] = EMAIL_ADDR
       self.msg['To'] = receiver
       self.msg.set_content(body)
-      #self.msg.add_attachment(file_data, maintype='text', subtype='txt', filename=file_name)
+
+      #Check if there's an attachment
+      if len(attach) != 0:
+         for file in attach:
+            with open(file, 'rb') as f:
+               file_data = f.read()
+               file_type = Path(file).suffix
+               file_name = Path(file).name
+            self.msg.add_attachment(file_data, maintype='file', subtype=file_type, filename=file_name)
+
+      else:
+         pass
 
       self.sendEmail()
 
@@ -33,8 +47,8 @@ class emailApp:
          with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
             smtp.login(EMAIL_ADDR, EMAIL_PW)
 
-            #smtp.send_message(self.msg)
-            print('Message sucessfully sended.')
+            smtp.send_message(self.msg)
+            mb.showinfo('Info', 'The email was successfully sent!.')
       except:
-         print('Something went wrong!')
+         mb.showerror('Error', 'Something went wrong, please try again!.')
 

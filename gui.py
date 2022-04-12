@@ -10,7 +10,7 @@ window.title('Email sender')
 
 class AppGUI:
    def __init__(self):
-      global txtArea, subjectInp, topEntry
+      global txtArea, subjectInp, emailEntry, numOfAddedAttch, addedAttachments
       #App width and height 
       width = 680
       height = 350
@@ -24,6 +24,9 @@ class AppGUI:
       y = (screen_h / 2) - (height) + 100
       
       window.geometry(f'{width}x{height}+{int(x)}+{int(y)}')
+      
+      #This list will save the path of added attachments so later we can send them all together
+      addedAttachments = []
 
       #Top frame where all the buttons and settings will be
       TopFrame = Frame(window, relief='sunken', border=3, height=150, highlightthickness=3, bg="#adc178")
@@ -38,21 +41,21 @@ class AppGUI:
       rightSide.grid(row=0, column=1, ipady=10, ipadx=40)
 
       #In top entry we'll write the address that we want to send an email
-      topLabel = Label(leftSide, text='Send email to: ', bg="#adc178", font=('Arial', 18))
+      topLabel = Label(leftSide, text='Send email to: ', bg="#adc178", font=('Lucida Bright', 18))
       topLabel.pack(anchor=NW, padx=10, pady=15)
 
-      topEntry = Entry(leftSide, font=('Arial', 13), relief='sunken', highlightthickness=3, bg="#97a97c", border=2)
-      #topEntry.insert(0, '@gmail.com')
-      topEntry.pack(anchor=NW, ipadx=15, ipady=5, padx=10, pady=3)
-      topEntry.config(highlightbackground='#718355', highlightcolor='#718355')
+      emailEntry = Entry(leftSide, font=('DaunPenh', 13), relief='sunken', highlightthickness=3, bg="#97a97c", border=2)
+      #emailEntry.insert(0, '@gmail.com')
+      emailEntry.pack(anchor=NW, ipadx=15, ipady=5, padx=10, pady=3)
+      emailEntry.config(highlightbackground='#718355', highlightcolor='#718355')
 
       #Add attacment button
-      addAttch = Button(rightSide, text='Add attachment', bg="#adc178", font=('Arial', 10), highlightthickness=3, border=3, relief='ridge', command=self.addAttach)
+      addAttch = Button(rightSide, text='Add attachment', bg="#adc178", font=('Rockwell', 10), highlightthickness=3, border=3, relief='ridge', command=self.addAttach)
       addAttch.config(highlightbackground='#adc178', highlightcolor='#adc178')
       addAttch.pack(anchor=CENTER, ipadx=12, ipady=4, padx=10, pady=15)
 
       #Send button
-      sendButton = Button(rightSide, text='Send email', bg="#adc178", font=('Arial', 10), highlightthickness=3, border=3, relief='ridge', command=lambda: self.sendEmail(txtArea.get('1.0', 'end-1c'), subjectInp.get(), topEntry.get()))
+      sendButton = Button(rightSide, text='Send email', bg="#adc178", font=('Rockwell', 10), highlightthickness=3, border=3, relief='ridge', command=lambda: self.sendEmail(txtArea.get('1.0', 'end-1c'), subjectInp.get(), emailEntry.get()))
       sendButton.config(highlightbackground='#adc178', highlightcolor='#adc178')
       sendButton.pack(anchor=CENTER, ipadx=25, ipady=4, padx=10)
 
@@ -66,21 +69,38 @@ class AppGUI:
       txtArea.pack(side=LEFT)
 
       #Subject input and label
-      subjectLabel = Label(bottomFrame, text='Subject: ', font=('Arial', 15), bg='#cfe1b9')
+      subjectLabel = Label(bottomFrame, text='Subject: ', font=('Lucida Bright', 15), bg='#cfe1b9')
       subjectLabel.pack(anchor=CENTER, padx=10, pady=5)
 
       subjectInp = Entry(bottomFrame,  highlightthickness=3, bg='#cfe1b9', border=2, font=('Arial', 12))
       subjectInp.pack(ipadx=10, ipady=5, padx=10, pady=3)
       subjectInp.config(highlightbackground='#718355', highlightcolor='#718355')
 
+      numOfAddedAttch = Label(bottomFrame, text=f'', bg='#cfe1b9', font=('Arial', 10))
+      numOfAddedAttch.pack(anchor=CENTER, pady=8, padx=5)
       
    def addAttach(self):
-      print('Hi')
 
+      selectFilesWindow = filedialog.askopenfilenames(initialdir="C:/", title="Select files", filetypes=(("All files", "*.*"), ("Images", ("*.jpg", "*.png", "*.svg", "*.jpeg")), ("Documents", ("*.doc", "*.html", "*.pdf", "*.txt", "*.hls"))))
+      
+      #By default selectFilesWindow will return a set of paths from files that we selected
+      #So we'll loop through the set and append them in the main addedAttachment list
+
+      if len(selectFilesWindow) != 0:
+         for x in range(0, len(selectFilesWindow)):
+            addedAttachments.append(selectFilesWindow[x])
+            
+         numOfAddedAttch.config(text=f'Added attachments: {len(addedAttachments)}')
+   
    def sendEmail(self, body, subject, receiver):
       if len(subject) != 0 or len(receiver) != 0:
+         #RegEx pattern to check if the email is valid or not.
          if re.search("^[\\w-]+@[0-9a-zA-Z]+\\.[a-z]{3,3}$", receiver) != None:
-            emailApp(subject, body, receiver)
+            emailApp(subject, body, receiver, addedAttachments)
+            subjectInp.delete(0, END)
+            emailEntry.delete(0, END)
+            numOfAddedAttch.config(text='')
+            addedAttachments.clear()
             txtArea.delete('1.0', 'end-1c')
          else:
             mb.showerror('Error', 'Invalid email address')

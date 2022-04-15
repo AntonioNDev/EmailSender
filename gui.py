@@ -76,7 +76,7 @@ class AppGUI:
       subjectInp.pack(ipadx=10, ipady=5, padx=10, pady=3)
       subjectInp.config(highlightbackground='#718355', highlightcolor='#718355')
 
-      numOfAddedAttach = Label(bottomFrame, text=f'Added attachemnts: {len(addedAttachments)}', bg="#adc178", font=('Arial', 10))
+      numOfAddedAttach = Label(bottomFrame, text=f'Added attachments: {len(addedAttachments)}', bg="#adc178", font=('Arial', 10))
       numOfAddedAttach.pack(anchor=CENTER, pady=8, padx=5)
 
       clearAddedAttchButton = Button(bottomFrame, text='Delete attachments', bg="#adc178", font=('Rockwell', 10), relief='ridge', highlightthickness=3, border=3 , command=self.clearAttach)

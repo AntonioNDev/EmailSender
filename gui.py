@@ -10,7 +10,7 @@ window.title('Email sender')
 
 class AppGUI:
    def __init__(self):
-      global txtArea, subjectInp, emailEntry, numOfAddedAttch, addedAttachments
+      global txtArea, subjectInp, emailEntry, numOfAddedAttach, addedAttachments, bottomFrame
       #App width and height 
       width = 680
       height = 350
@@ -38,7 +38,7 @@ class AppGUI:
       leftSide.grid(row=0, column=0, ipady=10, ipadx=40)
 
       rightSide = Frame(TopFrame, border=1, height=150, bg="#adc178")
-      rightSide.grid(row=0, column=1, ipady=10, ipadx=40)
+      rightSide.grid(row=0, column=1, ipady=10, ipadx=85)
 
       #In top entry we'll write the address that we want to send an email
       topLabel = Label(leftSide, text='Send email to: ', bg="#adc178", font=('Lucida Bright', 18))
@@ -52,15 +52,15 @@ class AppGUI:
       #Add attacment button
       addAttch = Button(rightSide, text='Add attachment', bg="#adc178", font=('Rockwell', 10), highlightthickness=3, border=3, relief='ridge', command=self.addAttach)
       addAttch.config(highlightbackground='#adc178', highlightcolor='#adc178')
-      addAttch.pack(anchor=CENTER, ipadx=12, ipady=4, padx=10, pady=15)
+      addAttch.pack(anchor=E, ipadx=25, ipady=4, padx=4, pady=15)
 
       #Send button
       sendButton = Button(rightSide, text='Send email', bg="#adc178", font=('Rockwell', 10), highlightthickness=3, border=3, relief='ridge', command=lambda: self.sendEmail(txtArea.get('1.0', 'end-1c'), subjectInp.get(), emailEntry.get()))
       sendButton.config(highlightbackground='#adc178', highlightcolor='#adc178')
-      sendButton.pack(anchor=CENTER, ipadx=25, ipady=4, padx=10)
+      sendButton.pack(anchor=E, ipadx=40, ipady=4, padx=4)
 
       #Bottom frame
-      bottomFrame = Frame(window, bg='#cfe1b9')
+      bottomFrame = Frame(window, bg="#adc178")
       bottomFrame.pack(side=BOTTOM, fill=BOTH, ipady=100)
 
       #text area
@@ -69,16 +69,24 @@ class AppGUI:
       txtArea.pack(side=LEFT)
 
       #Subject input and label
-      subjectLabel = Label(bottomFrame, text='Subject: ', font=('Lucida Bright', 15), bg='#cfe1b9')
+      subjectLabel = Label(bottomFrame, text='Subject: ', font=('Lucida Bright', 15), bg="#adc178")
       subjectLabel.pack(anchor=CENTER, padx=10, pady=5)
 
       subjectInp = Entry(bottomFrame,  highlightthickness=3, bg='#cfe1b9', border=2, font=('Arial', 12))
       subjectInp.pack(ipadx=10, ipady=5, padx=10, pady=3)
       subjectInp.config(highlightbackground='#718355', highlightcolor='#718355')
 
-      numOfAddedAttch = Label(bottomFrame, text=f'', bg='#cfe1b9', font=('Arial', 10))
-      numOfAddedAttch.pack(anchor=CENTER, pady=8, padx=5)
+      numOfAddedAttach = Label(bottomFrame, text=f'Added attachemnts: {len(addedAttachments)}', bg="#adc178", font=('Arial', 10))
+      numOfAddedAttach.pack(anchor=CENTER, pady=8, padx=5)
+
+      clearAddedAttchButton = Button(bottomFrame, text='Delete attachments', bg="#adc178", font=('Rockwell', 10), relief='ridge', highlightthickness=3, border=3 , command=self.clearAttach)
+      clearAddedAttchButton.pack(anchor=CENTER, pady=8, padx=5, ipadx=10, ipady=10)
       
+   def clearAttach(self):
+      addedAttachments.clear()
+      numOfAddedAttach.config(text=f'Added attachments: {len(addedAttachments)}')
+
+
    def addAttach(self):
 
       selectFilesWindow = filedialog.askopenfilenames(initialdir="C:/", title="Select files", filetypes=(("All files", "*.*"), ("Images", ("*.jpg", "*.png", "*.svg", "*.jpeg")), ("Documents", ("*.doc", "*.html", "*.pdf", "*.txt", "*.hls"))))
@@ -90,22 +98,25 @@ class AppGUI:
          for x in range(0, len(selectFilesWindow)):
             addedAttachments.append(selectFilesWindow[x])
             
-         numOfAddedAttch.config(text=f'Added attachments: {len(addedAttachments)}')
-   
+         numOfAddedAttach.config(text=f'Added attachments: {len(addedAttachments)}')
+         
+
    def sendEmail(self, body, subject, receiver):
       if len(subject) != 0 or len(receiver) != 0:
          #RegEx pattern to check if the email is valid or not.
          if re.search("^[\\w-]+@[0-9a-zA-Z]+\\.[a-z]{3,3}$", receiver) != None:
             emailApp(subject, body, receiver, addedAttachments)
+
+            
             subjectInp.delete(0, END)
             emailEntry.delete(0, END)
-            numOfAddedAttch.config(text='')
+            numOfAddedAttach.config(text='')
             addedAttachments.clear()
             txtArea.delete('1.0', 'end-1c')
          else:
             mb.showerror('Error', 'Invalid email address')
       else:
-         mb.showwarning('Warning', 'Empty subject or email address!')
+         mb.showwarning('Warning', 'Empty email address!')
          
 
 AppGUI()

@@ -15,7 +15,7 @@ class AppGUI:
       width = 680
       height = 350
  
-      #Getting the width and the height of the screen so we can
+      #Getting the width and the height of the screen so we can.
       #place the app window in the center
       screen_w = window.winfo_screenwidth()
       screen_h = window.winfo_screenheight()
